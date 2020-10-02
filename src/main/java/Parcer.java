@@ -5,11 +5,12 @@ public class Parcer {
     String file;
     final int[] askCol = new int[128];
     final int[] bidCol = new int[128];
-    int maxPrice = 1;
-    int minPrice = 1;
+
     int PRICE_LENGTH = 8;
     int QUANTITY_LENGTH = 8;
     int U_LENGTH = PRICE_LENGTH + QUANTITY_LENGTH + 8;
+    int maxPrice = 1;
+    int minPrice = (int)Math.pow(10,PRICE_LENGTH);
 
     public Parcer() {
         Arrays.fill(askCol, 0);
@@ -33,7 +34,6 @@ public class Parcer {
 
             switch (str[0]) {
                 case 'u':
-
                     for (int i = 2; i < U_LENGTH; i++) {
                         if (str[i] == ',') {
                             if (priceLength == 0) {
@@ -41,12 +41,12 @@ public class Parcer {
                                 for (int j = 1; j <= priceLength; j++) {
 //                                    price+=Math.pow(10,j-1)*(str[i-j]-0x30);
                                     price += pow(j) * (str[i - j] - 0x30);
+
                                 }
                                 continue;
                             } else {
                                 quantLength = i - 3 - priceLength;
                                 operation = str[i + 1];
-
                                 for (int j = 1; j <= quantLength; j++) {
 //                                    quantity+=Math.pow(10,j-1)*(str[i-j]-0x30);
                                     quantity += pow(j) * (str[i - j] - 0x30);
@@ -69,13 +69,38 @@ public class Parcer {
                         askCol[price] = 0;
                         bidCol[price] = -qq;
                     }
-                    System.out.println(toParce + "\t " + askCol[price] + "\t " + bidCol[price]);
+
+                    if(price>maxPrice){
+                        maxPrice = price;
+                    }
+                    if(price<minPrice && price>0){
+                        minPrice = price;
+                    }
+
+//                    System.out.println(toParce + "\t " + askCol[price] + "\t " + bidCol[price] + "\t" + minPrice + "\t" + maxPrice);
+//                   System.out.println(toParce + "\t " + askCol[price] + "\t " + bidCol[price]);
+                   System.out.println(toParce + "\t " + price + "\t" + minPrice + "\t" + maxPrice);
                     priceLength = 0;
                     price = 0;
                     quantity = 0;
                     break;
-
+                /*
+                            q,best_bid - print best bid price and size
+                            q,best_ask - print best ask price and size
+                            q,size,<price> - print size at specified price (bid, ask or spread).
+                */
                 case 'q':
+                    switch(str[7]){
+                        case'b':
+                            break;
+
+
+                        case'a':
+                            break;
+                        default:
+
+                            break;
+                    }
 
                     break;
                 case 'o':
