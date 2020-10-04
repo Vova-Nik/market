@@ -13,12 +13,24 @@ public class DataHolder {
     final int[] askCol = new int[MAX_POSSIBLE_PRICE];
     final int[] bidCol = new int[MAX_POSSIBLE_PRICE];
 
+    private int differedBuy = 0;
+    private int differedSell = 0;
+
     public DataHolder() {
         Arrays.fill(askCol, 0);
         Arrays.fill(bidCol, 0);
     }
 
     public int updateBid(int price, int quant) {
+        if(differedSell>0){
+            quant=quant-differedSell;
+            if(quant<0){
+                quant=0;
+                differedSell = -quant;
+                return 0;
+            }
+            differedSell = 0;
+        }
         bidCol[price] += quant;
         int qq = askCol[price] - bidCol[price];
         if (qq >= 0) {
@@ -39,6 +51,16 @@ public class DataHolder {
     }
 
     public int updateAsk(int price, int quant) {
+        if(differedBuy>0){
+            quant=quant-differedBuy;
+            if(quant<0){
+                quant=0;
+                differedBuy = -quant;
+                return 0;
+            }
+            differedBuy = 0;
+        }
+
         askCol[price] += quant;
         int qq = askCol[price] - bidCol[price];
         if (qq >= 0) {
@@ -95,28 +117,36 @@ public class DataHolder {
         return -1;
     }
 
-    public int sell(int quant){
-        while(true) {
+    public int sell(int quant) {
+        while (true) {
             int ba = bestAsk();
+            if (ba <= 0) {
+                differedSell = quant;
+                return -1;
+            }
             askCol[ba] = askCol[ba] - quant;
             if (askCol[ba] >= 0) {
                 break;
             }
-            quant = - askCol[ba];
-            askCol[ba] =0;
+            quant = -askCol[ba];
+            askCol[ba] = 0;
         }
         return 0;
     }
 
-    public int buy(int quant){
-        while(true) {
+    public int buy(int quant) {
+        while (true) {
             int bb = bestBid();
+            if (bb <= 0) {
+                differedBuy = quant;
+                return -1;
+            }
             bidCol[bb] = bidCol[bb] - quant;
             if (bidCol[bb] >= 0) {
                 break;
             }
-            quant = - bidCol[bb];
-            bidCol[bb] =0;
+            quant = -bidCol[bb];
+            bidCol[bb] = 0;
         }
         return 0;
     }

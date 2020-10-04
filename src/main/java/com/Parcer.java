@@ -26,11 +26,10 @@ public class Parcer {
                 toReturn = parceO(str);
                 break;
             default:
-                toReturn = -1;
+                return -1;
         }
         return toReturn;
     }
-
 
     int parceU(char[] str) {
         int priceLength = 0;
@@ -46,7 +45,7 @@ public class Parcer {
                     for (int j = 1; j <= priceLength; j++) {
                         price += pow(j) * (str[i - j] - 0x30);
                     }
-                   // continue;
+                    // continue;
                 } else {
                     quantLength = i - 3 - priceLength;
                     operation = str[i + 1];
@@ -82,22 +81,23 @@ public class Parcer {
     int parceO(char[] str) {
         //        o,buy,<size> - removes <size> shares out of asks, most cheap ones.
         //        o,sell,<size> - removes <size> shares out of bids, most expensive
-//        int quant = 0;
-//        int price = 0;
-//        if (str[2] == 'b') {
-//            for (int i = str.length - 1, j = 1; i >= 6; i--, j++) {
-//                quantiti += (str[i] - 0x30) * pow(j);
-//            }
-//                       return 0;
-//        }
-//        if (str[2] == 's') {
-//            for (int i = str.length - 1, j = 1; i >= 7; i--, j++) {
-//                quantiti += (str[i] - 0x30) * pow(j);
-//            }
-//            return 0;
-//        }
 
-
+        int quant = 0;
+        int price = 0;
+        if (str[2] == 'b') {
+            for (int i = str.length - 1, j = 1; i >= 6; i--, j++) {
+                quant += (str[i] - 0x30) * pow(j);
+            }
+            dataHolder.sell(quant);
+            return 0;
+        }
+        if (str[2] == 's') {
+            for (int i = str.length - 1, j = 1; i >= 7; i--, j++) {
+                quant += (str[i] - 0x30) * pow(j);
+            }
+            dataHolder.buy(quant);
+            return 0;
+        }
         return -1;
     }
 
