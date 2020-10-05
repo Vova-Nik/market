@@ -22,8 +22,8 @@ public class Market {
         Scanner scanner = new Scanner(inpFile);
         String toParce;
 
-        DataHolder dataHolder = new DataHolder();
-        Parcer parcer = new Parcer(dataHolder);
+        Model model = new Model();
+        Parcer parcer = new Parcer(model);
 
         while (scanner.hasNextLine()) {
             toParce = scanner.nextLine();

@@ -1,14 +1,11 @@
 package com;
 
-import java.util.Arrays;
-import java.util.Scanner;
-
 public class Parcer {
     String file;
-    DataHolder dataHolder;
+    Model model;
 
-    public Parcer(DataHolder dataHolder) {
-        this.dataHolder = dataHolder;
+    public Parcer(Model model) {
+        this.model = model;
     }
 
     public int parce(String file) {
@@ -38,7 +35,7 @@ public class Parcer {
         int quantity = 0;
         char operation = ' '; //b == bid, a == ask;
 
-        for (int i = 2; i < dataHolder.U_LENGTH; i++) {
+        for (int i = 2; i < model.U_LENGTH; i++) {
             if (str[i] == ',') {
                 if (priceLength == 0) {
                     priceLength = i - 2;
@@ -57,25 +54,25 @@ public class Parcer {
             }
         }
         if (operation == 'a') {
-            dataHolder.updateAsk(price, quantity);
+            model.updateAsk(price, quantity);
         } else {
-            dataHolder.updateBid(price, quantity);
+            model.updateBid(price, quantity);
         }
         return 0;
     }
 
     int parceQ(char[] str) {
         if (str[7] == 'b') {     //best bid
-            return dataHolder.bestBid();
+            return model.bestBid();
         }
         if (str[7] == 'a') {     //best ask
-            return dataHolder.bestAsk();
+            return model.bestAsk();
         }
         int price = 0;//size
         for (int i = str.length - 2, j = 1; i >= 7; i--, j++) {
             price += (str[i] - 0x30) * pow(j);
         }
-        return dataHolder.querySize(price);
+        return model.querySize(price);
     }
 
     int parceO(char[] str) {
@@ -88,14 +85,14 @@ public class Parcer {
             for (int i = str.length - 1, j = 1; i >= 6; i--, j++) {
                 quant += (str[i] - 0x30) * pow(j);
             }
-            dataHolder.sell(quant);
+            model.sell(quant);
             return 0;
         }
         if (str[2] == 's') {
             for (int i = str.length - 1, j = 1; i >= 7; i--, j++) {
                 quant += (str[i] - 0x30) * pow(j);
             }
-            dataHolder.buy(quant);
+            model.buy(quant);
             return 0;
         }
         return -1;
