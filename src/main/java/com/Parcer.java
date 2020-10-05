@@ -66,13 +66,13 @@ public class Parcer {
 
     int parceQ(char[] str) {
         if (str[7] == 'b') {     //best bid
-            return dataHolder.queryBestBid();
+            return dataHolder.bestBid();
         }
         if (str[7] == 'a') {     //best ask
-            return dataHolder.queryBestAsk();
+            return dataHolder.bestAsk();
         }
-        int price = 0;
-        for (int i = str.length - 1, j = 1; i >= 7; i--, j++) {
+        int price = 0;//size
+        for (int i = str.length - 2, j = 1; i >= 7; i--, j++) {
             price += (str[i] - 0x30) * pow(j);
         }
         return dataHolder.querySize(price);

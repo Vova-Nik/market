@@ -76,4 +76,51 @@ public class TestMarket {
         assertEquals(4,parcer.parce("q,size,11"));
 
     }
+
+    @Test
+    public void testCons(){
+        dataHolder.clear();
+        assertEquals(-1,parcer.parce("q,best_bid\n"));
+        assertTrue(parcer.parce("q,best_ask\n")>1000);
+        assertEquals(0,parcer.parce("q,size,10\n"));
+        parcer.parce("u,1024,5535,bid");
+        parcer.parce("u,1087,55350,ask");
+        dataHolder.showState();
+        assertEquals(1024,parcer.parce("q,best_bid\n"));
+        assertEquals(1087,parcer.parce("q,best_ask\n"));
+        assertEquals(5535,parcer.parce("q,size,1024\n"));
+        assertEquals(55350,parcer.parce("q,size,1087\n"));
+
+        dataHolder.clear();
+        parcer.parce("u,9,1,bid");
+        assertEquals(9,parcer.parce("q,best_bid\n"));
+        assertTrue(parcer.parce("q,best_ask\n")>1000);
+        assertEquals(0,parcer.parce("q,size,10\n"));
+        assertEquals(1,parcer.parce("q,size,9\n"));
+        parcer.parce("u,9,1,ask");
+        assertEquals(-1,parcer.parce("q,best_bid\n"));
+        assertEquals(-1,parcer.parce("q,best_ask\n"));
+        assertEquals(0,parcer.parce("q,size,10\n"));
+        assertEquals(0,parcer.parce("q,size,9\n"));
+
+        parcer.parce("u,10,3,ask");
+        assertEquals(-1,parcer.parce("q,best_bid\n"));
+        assertEquals(10,parcer.parce("q,best_ask\n"));
+        assertEquals(3,parcer.parce("q,size,10\n"));
+        parcer.parce("u,10,3,bid");
+        assertEquals(-1,parcer.parce("q,best_bid\n"));
+        assertEquals(-1,parcer.parce("q,best_ask\n"));
+        assertEquals(0,parcer.parce("q,size,10\n"));
+        parcer.parce("u,8,3,bid");
+        parcer.parce("u,8,3,bid");
+        parcer.parce("u,9,2,bid");
+        parcer.parce("u,10,1,bid");
+        assertEquals(10,parcer.parce("q,best_bid\n"));
+        assertEquals(-1,parcer.parce("q,best_ask\n"));
+        assertEquals(6,parcer.parce("q,size,8\n"));
+        assertEquals(0,parcer.parce("q,size,8001\n"));
+
+        dataHolder.showState();
+
+    }
 }

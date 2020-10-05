@@ -16,21 +16,33 @@ public class DataHolder {
     private int differedBuy = 0;
     private int differedSell = 0;
 
+    private int bestBid = 0;
+    private int bestAsk = Integer.MAX_VALUE;
+
     public DataHolder() {
         Arrays.fill(askCol, 0);
         Arrays.fill(bidCol, 0);
     }
 
     public int updateBid(int price, int quant) {
-        if(differedSell>0){
-            quant=quant-differedSell;
-            if(quant<0){
-                quant=0;
+        if (differedSell > 0) {
+            quant = quant - differedSell;
+            if (quant < 0) {
+                quant = 0;
                 differedSell = -quant;
+                updateMinMaxPrices(price);
                 return 0;
             }
             differedSell = 0;
         }
+        if (price <= bestBid) {
+            bidCol[price] += quant;
+            updateMinMaxPrices(price);
+            return 0;
+        }
+
+
+
         bidCol[price] += quant;
         int qq = askCol[price] - bidCol[price];
         if (qq >= 0) {
@@ -41,20 +53,62 @@ public class DataHolder {
             bidCol[price] = -qq;
         }
 
+
+        if (price > bestBid) {
+            bestBid = price;
+        }
+        return 0;
+    }
+
+    private void updateMinMaxPrices(int price) {
         if (price > maxPrice) {
             maxPrice = price;
         }
         if (price < minPrice && price > 0) {
             minPrice = price;
         }
+    }
+
+
+
+    private int normalizeBid(int price, int quant) {
+        while (true) {
+            if(bestAsk<=price)
+            askCol[bestAsk] = askCol[bestAsk] - quant;
+            if (askCol[bestAsk] > 0) {
+                break;
+            }
+            if (askCol[bestAsk] == 0) {
+                updateBests();
+                break;
+            }
+        }
         return 0;
     }
 
+    private void updateBests() {
+        bestBid = 0;
+        for (int i = maxPrice; i >= minPrice; i--) {
+            if (bidCol[i] != 0) {
+                bestBid = i;
+                break;
+            }
+        }
+        bestAsk = Integer.MAX_VALUE;
+        for (int i = minPrice; i <= maxPrice; i++) {
+            if (askCol[i] != 0) {
+                bestAsk = i;
+                break;
+            }
+        }
+    }
+
+
     public int updateAsk(int price, int quant) {
-        if(differedBuy>0){
-            quant=quant-differedBuy;
-            if(quant<0){
-                quant=0;
+        if (differedBuy > 0) {
+            quant = quant - differedBuy;
+            if (quant < 0) {
+                quant = 0;
                 differedBuy = -quant;
                 return 0;
             }
@@ -76,45 +130,36 @@ public class DataHolder {
         if (price < minPrice && price > 0) {
             minPrice = price;
         }
+        if (price < bestAsk) {
+            bestAsk = price;
+        }
         return 0;
-    }
-
-    public int queryBestBid() {
-        return bestBid();
-    }
-
-    public int queryBestAsk() {
-        return bestAsk();
     }
 
     public int querySize(int price) {
         return Math.max(askCol[price], bidCol[price]);
     }
 
-    public int orderSell(int quant) {
-        return 0;
+
+    public int bestBid() {
+        return bestBid;
+
+//        for (int i = maxPrice; i >= minPrice; i--) {
+//            if (bidCol[i] != 0) {
+//                return i;
+//            }
+//        }
+//        return -1;
     }
 
-    public int orderBuy(int quant) {
-        return 0;
-    }
-
-    private int bestBid() {
-        for (int i = maxPrice; i >= minPrice; i--) {
-            if (bidCol[i] != 0) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    private int bestAsk() {
-        for (int i = minPrice; i <= maxPrice; i++) {
-            if (askCol[i] != 0) {
-                return i;
-            }
-        }
-        return -1;
+    public int bestAsk() {
+        return bestAsk;
+//        for (int i = minPrice; i <= maxPrice; i++) {
+//            if (askCol[i] != 0) {
+//                return i;
+//            }
+//        }
+//        return -1;
     }
 
     public int sell(int quant) {
@@ -162,8 +207,23 @@ public class DataHolder {
 
     public void clear() {
         minPrice = (int) Math.pow(10, PRICE_LENGTH);
+        maxPrice = 0;
+        differedBuy = 0;
+        differedSell = 0;
+
+        bestBid = 0;
+        bestAsk = Integer.MAX_VALUE;
+
+
         Arrays.fill(askCol, 0);
         Arrays.fill(bidCol, 0);
     }
 
+    public void showState() {
+        System.out.println("pr bid ask");
+
+        for (int i = minPrice; i <= maxPrice; i++) {
+            System.out.println(i + "\t" + bidCol[i] + "\t" + askCol[i]);
+        }
+    }
 }
