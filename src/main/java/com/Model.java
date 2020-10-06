@@ -37,54 +37,46 @@ public class Model {
             quant = -differedSell;
         }
         int state = 0;
-        if (bestBid != 0) state |= 0b0001;
-        if (bestAsk != 0) state |= 0b0010;
-        if (price > bestAsk()) state |= 0b0100;
-        // if (price <= bestBid()) state |= 0b1000;
+        if (bestAsk != 0) state |= 0b0001;
+        if (price >= bestAsk()) state |= 0b0010;
+
         switch (state) {
             case 0:
-            case 4:
-                bestBid = price;
-                bidCol[price] = quant;
-                break;
             case 1:
-//                sellForPrice(price,quant);
-                bidCol[price] = quant;
+                bidCol[price] += quant;
                 updateBestBid();
                 break;
             case 2:
+                bidCol[price] = buyForPrice(price, quant);
                 updateBestAsk();
+                updateBestBid();
                 break;
             case 3:
-                sellForPrice(price,quant);
-                updateBestAsk();
                 break;
-            case 5:
-                bestAsk = price;
-                askCol[price] = quant;
-                break;
-            case 6:
-                askCol[price] = quant;
-                updateBestAsk();
-                break;
-            case 7:
-                askCol[price] = quant;
-                updateBestAsk();
-                break;
-
         }
         return 0;
     }
 
-
-    private int sellForPrice(int price, int quant) {
-        for (int i = price; i <= bestAsk; i++) {
+    private int buyForPrice(int price, int quant) {
+        for (int i = bestAsk; i <= price; i++) {
             askCol[i] -= quant;
-            if (askCol[i] >= 0) {
+            if (askCol[i] > 0) {
                 return 0;
             }
             quant = -askCol[i];
             askCol[i] = 0;
+        }
+        return quant;
+    }
+
+    private int sellForPrice(int price, int quant) {
+        for (int i = bestBid; i >= price; i--) {
+            bidCol[i] -= quant;
+            if (bidCol[i] >= 0) {
+                return 0;
+            }
+            quant = -bidCol[i];
+            bidCol[i] = 0;
         }
         return quant;
     }
@@ -156,39 +148,25 @@ public class Model {
         }
         int state = 0;
         if (bestBid != 0) state |= 0b0001;
-        if (bestAsk != 0) state |= 0b0010;
-        if (price > bestBid()) state |= 0b0100;
-       // if (price <= bestBid()) state |= 0b1000;
+        if (price <= bestBid()) state |= 0b0010;
         switch (state) {
             case 0:
-            case 4:
-                bestAsk = price;
-                askCol[price] = quant;
-                break;
             case 1:
-                sellForPrice(price,quant);
+                askCol[price] += quant;
                 updateBestAsk();
                 break;
+
             case 2:
                 updateBestAsk();
+                updateBestBid();
                 break;
+
             case 3:
                 sellForPrice(price,quant);
                 updateBestAsk();
+                updateBestBid();
                 break;
-            case 5:
-                bestAsk = price;
-                askCol[price] = quant;
-                break;
-            case 6:
-                askCol[price] = quant;
-                updateBestAsk();
-                break;
-            case 7:
-                askCol[price] = quant;
-                updateBestAsk();
-                break;
-        }
+         }
         return 0;
     }
 
@@ -202,21 +180,6 @@ public class Model {
         return 0;
     }
 
-    private int buyForPrice(int price, int quant) {
-//        if (bestAsk > price) {
-//            return price;
-//        }
-        for (int i = bestAsk; i <= price; i++) {
-            askCol[i] -= quant;
-            if (askCol[i] > 0) {
-                return 0;
-            }
-            quant = -askCol[i];
-            askCol[i] = 0;
-
-        }
-        return quant;
-    }
 
     public int querySize(int price) {
         return Math.max(askCol[price], bidCol[price]);
