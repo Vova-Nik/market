@@ -47,11 +47,12 @@ public class Model {
                 updateBestBid();
                 break;
             case 2:
+
+                break;
+            case 3:
                 bidCol[price] = buyForPrice(price, quant);
                 updateBestAsk();
                 updateBestBid();
-                break;
-            case 3:
                 break;
         }
         return 0;
