@@ -26,36 +26,31 @@ public class Model {
         Arrays.fill(bidCol, 0);
     }
 
-    public int updateBid(int price, int quant) {
-        updateMinMaxPrices(price);
+    public void updateBid(int price, int quant) {
+        if (price < minPrice || price > maxPrice) {
+            updateMinMaxPrices(price);
+        }
         if (differedSell > 0) {
             differedSell = differedSell - quant;
             if (differedSell > 0) {
-                return 0;
+                return;
             }
-            differedSell = 0;
             quant = -differedSell;
+            differedSell = 0;
         }
-        int state = 0;
-        if (bestAsk != 0) state |= 0b0001;
-        if (price >= bestAsk()) state |= 0b0010;
-
-        switch (state) {
-            case 0:
-            case 1:
-                bidCol[price] += quant;
-                updateBestBid();
-                break;
-            case 2:
-
-                break;
-            case 3:
-                bidCol[price] = buyForPrice(price, quant);
-                updateBestAsk();
-                updateBestBid();
-                break;
+        if (bestAsk == 0) {
+            bidCol[price] += quant;
+            updateBestBid();
+            return;
         }
-        return 0;
+        if (price < bestAsk) {
+            bidCol[price] += quant;
+            updateBestBid();
+            return;
+        }
+        bidCol[price] = buyForPrice(price, quant);
+        updateBestAsk();
+        updateBestBid();
     }
 
     private int buyForPrice(int price, int quant) {
@@ -66,18 +61,6 @@ public class Model {
             }
             quant = -askCol[i];
             askCol[i] = 0;
-        }
-        return quant;
-    }
-
-    private int sellForPrice(int price, int quant) {
-        for (int i = bestBid; i >= price; i--) {
-            bidCol[i] -= quant;
-            if (bidCol[i] >= 0) {
-                return 0;
-            }
-            quant = -bidCol[i];
-            bidCol[i] = 0;
         }
         return quant;
     }
@@ -94,29 +77,14 @@ public class Model {
         }
     }
 
-    private int normalizeBid(int price, int quant) {
-        while (true) {
-            if (bestAsk <= price)
-                askCol[bestAsk] = askCol[bestAsk] - quant;
-            if (askCol[bestAsk] > 0) {
-                break;
-            }
-            if (askCol[bestAsk] == 0) {
-                updateBests();
-                break;
-            }
-        }
-        return 0;
-    }
-
     private void updateBestBid() {
-        bestBid = 0;
-        for (int i = maxPrice; i >= minPrice; i--) {
+        for (int i = maxPrice; i >= 0; i--) {
             if (bidCol[i] > 0) {
                 bestBid = i;
-                break;
+                return;
             }
         }
+        bestBid = 0;
     }
 
     private void updateBests() {
@@ -137,42 +105,42 @@ public class Model {
     }
 
     public int updateAsk(int price, int quant) {
-        updateMinMaxPrices(price);
+        if (price > maxPrice || price < minPrice) {
+            updateMinMaxPrices(price);
+        }
         if (differedBuy > 0) {
-            quant = quant - differedBuy;
-            if (quant < 0) {
-                quant = 0;
-                differedBuy = -quant;
+            differedBuy -= quant;
+            if (differedBuy > 0) {
                 return 0;
             }
+            quant = -differedBuy;
             differedBuy = 0;
         }
-        int state = 0;
-        if (bestBid != 0) state |= 0b0001;
-        if (price <= bestBid()) state |= 0b0010;
-        switch (state) {
-            case 0:
-            case 1:
-                askCol[price] += quant;
-                updateBestAsk();
-                break;
-
-            case 2:
-                updateBestAsk();
-                updateBestBid();
-                break;
-
-            case 3:
-                sellForPrice(price,quant);
-                updateBestAsk();
-                updateBestBid();
-                break;
-         }
+        if (price > bestBid) {
+            askCol[price] += quant;
+            updateBestAsk();
+            return 0;
+        }
+        sellForPrice(price, quant); //price <= bestBid;
+        updateBestAsk();
+        updateBestBid();
         return 0;
     }
 
+    private int sellForPrice(int price, int quant) {
+        for (int i = bestBid; i >= price; i--) {
+            bidCol[i] -= quant;
+            if (bidCol[i] >= 0) {
+                return 0;
+            }
+            quant = -bidCol[i];
+            bidCol[i] = 0;
+        }
+        return quant;
+    }
+
     private int updateBestAsk() {
-        for (int i = minPrice; i <= maxPrice; i++) {
+        for (int i = minPrice; i <= askCol.length; i++) {
             if (askCol[i] > 0) {
                 bestAsk = i;
                 break;
@@ -181,44 +149,65 @@ public class Model {
         return 0;
     }
 
-
     public int querySize(int price) {
-        return Math.max(askCol[price], bidCol[price]);
+        // return Math.max(askCol[price], bidCol[price]);
+        return askCol[price] >= bidCol[price] ? askCol[price] : bidCol[price];
     }
 
-
-    public int sell(int quant) {
-        while (true) {
-            int ba = bestAsk();
-            if (ba <= 0) {
-                differedSell = quant;
-                return -1;
+    public void sell(int quant) {
+        quant += differedSell;
+        differedSell = 0;
+        if (differedBuy > 0) {
+            differedBuy -= quant;
+            if (differedBuy >= 0) {
+                return;
             }
-            askCol[ba] = askCol[ba] - quant;
-            if (askCol[ba] >= 0) {
-                break;
-            }
-            quant = -askCol[ba];
-            askCol[ba] = 0;
+            differedBuy = 0;
+            quant = -differedBuy;
         }
-        return 0;
+        for (int i = bestBid; i >= minPrice; i--) {
+            bidCol[i] -= quant;
+            if (bidCol[i] > 0) {
+                bestBid = i;
+                return;
+            }
+            if (bidCol[i] == 0) {
+                updateBestBid();
+                return;
+            }
+            quant = -bidCol[i];
+            bidCol[i] = 0;
+        }
+        differedSell = quant;
+        bestBid = 0;
     }
 
-    public int buy(int quant) {
-        while (true) {
-            int bb = bestBid();
-            if (bb <= 0) {
-                differedBuy = quant;
-                return -1;
+    public void buy(int quant) {
+        quant += differedBuy;
+        differedBuy = 0;
+        if (differedSell > 0) {
+            differedSell -= quant;
+            if (differedSell >= 0) {
+                return;
             }
-            bidCol[bb] = bidCol[bb] - quant;
-            if (bidCol[bb] >= 0) {
-                break;
-            }
-            quant = -bidCol[bb];
-            bidCol[bb] = 0;
+            differedSell = 0;
+            quant = -differedSell;
         }
-        return 0;
+        for (int i = bestAsk; i <= maxPrice; i++) {
+            askCol[i] -= quant;
+            if (askCol[i] > 0) {
+                bestAsk = i;
+                return;
+            }
+            if (askCol[i] == 0) {
+                updateBestAsk();
+                return;
+            }
+            quant = -askCol[i];
+            askCol[i] = 0;
+        }
+        bestAsk = 0;
+        differedBuy = quant;
     }
 
     /*  ****************** for testing purposes **********************/
@@ -255,6 +244,9 @@ public class Model {
         }
         if (way > 1) {
             System.out.println("Min Price = " + minPrice + " Max Price = " + maxPrice);
+        }
+        if (way > 2) {
+            System.out.println("differedBuy = " + differedBuy + " differedSell = " + differedSell);
         }
     }
 }

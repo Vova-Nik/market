@@ -77,27 +77,25 @@ public class Parcer {
 
     int parceO(char[] str) {
         //        o,buy,<size> - removes <size> shares out of asks, most cheap ones.
-        //        o,sell,<size> - removes <size> shares out of bids, most expensive
+        //        o,sell,<size> - removes <size> shares out of bids, most expensive.
 
         int quant = 0;
-        int price = 0;
         if (str[2] == 'b') {
             for (int i = str.length - 1, j = 1; i >= 6; i--, j++) {
                 quant += (str[i] - 0x30) * pow(j);
             }
-            model.sell(quant);
+            model.buy(quant);
             return 0;
         }
         if (str[2] == 's') {
             for (int i = str.length - 1, j = 1; i >= 7; i--, j++) {
                 quant += (str[i] - 0x30) * pow(j);
             }
-            model.buy(quant);
+            model.sell(quant);
             return 0;
         }
         return -1;
     }
-
 
     final int[] exp10 = {1, 1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000};
 
