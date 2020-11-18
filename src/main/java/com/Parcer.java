@@ -2,9 +2,11 @@ package com;
 
 public class Parcer {
     String file;
-    Model model;
+    private final Model model;
+    private final Result result;
 
     public Parcer(Model model) {
+        this.result = new Result(0, 0);
         this.model = model;
     }
 
@@ -102,4 +104,14 @@ public class Parcer {
     int pow(int exp) {
         return exp10[exp];
     }
+
+}
+
+class Result {
+    Result(int size, int quant) {
+        this.size = size;
+        this.quant = quant;
+    }
+    int size;
+    int quant;
 }

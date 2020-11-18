@@ -86,6 +86,15 @@ public class Model {
         }
         bestBid = 0;
     }
+    private int updateBestAsk() {
+        for (int i = minPrice; i <= askCol.length; i++) {
+            if (askCol[i] > 0) {
+                bestAsk = i;
+                break;
+            }
+        }
+        return 0;
+    }
 
     private void updateBests() {
         bestBid = Integer.MAX_VALUE;
@@ -137,16 +146,6 @@ public class Model {
             bidCol[i] = 0;
         }
         return quant;
-    }
-
-    private int updateBestAsk() {
-        for (int i = minPrice; i <= askCol.length; i++) {
-            if (askCol[i] > 0) {
-                bestAsk = i;
-                break;
-            }
-        }
-        return 0;
     }
 
     public int querySize(int price) {
