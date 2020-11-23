@@ -2,35 +2,34 @@ package com;
 
 public class Parcer {
     String file;
+//    String toReturn ="";
     private final Model model;
-    private final Result result;
+    private String result = "";
 
     public Parcer(Model model) {
-        this.result = new Result(0, 0);
+//        this.result = new Result(0, 0);
         this.model = model;
     }
 
-    public int parce(String file) {
-
-        char[] str = file.toCharArray();
-        int toReturn;
-        switch (str[0]) {
+    public String parce(String line) {
+        char[] lnCh = line.toCharArray();
+        switch (lnCh[0]) {
             case 'u':
-                toReturn = parceU(str);
-                break;
+                return parceU(lnCh);
+//                break;
             case 'q':
-                toReturn = parceQ(str);
-                break;
+                return parceQ(lnCh);
+//                break;
             case 'o':
-                toReturn = parceO(str);
-                break;
-            default:
-                return -1;
+                return parceO(lnCh);
+//                break;
+//            default:
+//                return -1;
         }
-        return toReturn;
+        return "";
     }
 
-    int parceU(char[] str) {
+    private String parceU(char[] str) {
         int priceLength = 0;
         int quantLength;
         int price = 0;
@@ -60,24 +59,28 @@ public class Parcer {
         } else {
             model.updateBid(price, quantity);
         }
-        return 0;
+        return "";
     }
 
-    int parceQ(char[] str) {
+    private String parceQ(char[] str) {
         if (str[7] == 'b') {     //best bid
-            return model.bestBid();
+            result = model.bestBid() + "," + model.querySize(model.bestBid()) + "\n";
+            //            result.size = model.querySize(model.bestBid());
+            return result;
         }
         if (str[7] == 'a') {     //best ask
-            return model.bestAsk();
+            result = model.bestAsk() + "," +  model.querySize(model.bestAsk()) + "\n";
+            //result.size = model.querySize(model.bestAsk());
+            return result;
         }
-        int price = 0;//size
+        int price = 0;  //size
         for (int i = str.length - 2, j = 1; i >= 7; i--, j++) {
             price += (str[i] - 0x30) * pow(j);
         }
-        return model.querySize(price);
+        return model.querySize(price) +"\n";
     }
 
-    int parceO(char[] str) {
+    private String parceO(char[] str) {
         //        o,buy,<size> - removes <size> shares out of asks, most cheap ones.
         //        o,sell,<size> - removes <size> shares out of bids, most expensive.
 
@@ -87,16 +90,16 @@ public class Parcer {
                 quant += (str[i] - 0x30) * pow(j);
             }
             model.buy(quant);
-            return 0;
+            return "";
         }
         if (str[2] == 's') {
             for (int i = str.length - 1, j = 1; i >= 7; i--, j++) {
                 quant += (str[i] - 0x30) * pow(j);
             }
             model.sell(quant);
-            return 0;
+            return "";
         }
-        return -1;
+        return "";
     }
 
     final int[] exp10 = {1, 1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000};
@@ -107,11 +110,12 @@ public class Parcer {
 
 }
 
-class Result {
-    Result(int size, int quant) {
-        this.size = size;
-        this.quant = quant;
-    }
-    int size;
-    int quant;
-}
+//
+//class Result {
+//    Result(int size, int price) {
+//        this.size = size;
+//        this.price = price;
+//    }
+//    int size;
+//    int price;
+//}
