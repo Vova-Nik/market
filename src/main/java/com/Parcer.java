@@ -1,8 +1,10 @@
 package com;
 
+import java.util.Arrays;
+
 public class Parcer {
     String file;
-//    String toReturn ="";
+    //    String toReturn ="";
     private final Model model;
     private String result = "";
 
@@ -16,15 +18,10 @@ public class Parcer {
         switch (lnCh[0]) {
             case 'u':
                 return parceU(lnCh);
-//                break;
             case 'q':
                 return parceQ(lnCh);
-//                break;
             case 'o':
                 return parceO(lnCh);
-//                break;
-//            default:
-//                return -1;
         }
         return "";
     }
@@ -69,15 +66,15 @@ public class Parcer {
             return result;
         }
         if (str[7] == 'a') {     //best ask
-            result = model.bestAsk() + "," +  model.querySize(model.bestAsk()) + "\n";
+            result = model.bestAsk() + "," + model.querySize(model.bestAsk()) + "\n";
             //result.size = model.querySize(model.bestAsk());
             return result;
         }
         int price = 0;  //size
-        for (int i = str.length - 2, j = 1; i >= 7; i--, j++) {
+        for (int i = str.length - 1, j = 1; i >= 7; i--, j++) {
             price += (str[i] - 0x30) * pow(j);
         }
-        return model.querySize(price) +"\n";
+        return model.querySize(price) + "\n";
     }
 
     private String parceO(char[] str) {
