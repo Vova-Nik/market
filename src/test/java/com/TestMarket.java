@@ -1,9 +1,6 @@
 package com;
-//package Users.Vovchik.IdeaProjects.market.src.main.java.com;
-//        package com.nikolenko.homeworks.homework_20;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import java.util.Scanner;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestMarket {
@@ -43,7 +40,6 @@ public class TestMarket {
         parcer.parce("u,7,8,bid");
         parcer.parce("u,6,12,bid");
 
-//        model.showState(2);
         assertEquals("1\n",parcer.parce("q,size,9"));
         assertEquals("8\n",parcer.parce("q,size,7"));
         assertEquals("9,1\n",parcer.parce("q,best_bid"));

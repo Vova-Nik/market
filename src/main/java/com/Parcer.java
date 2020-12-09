@@ -4,12 +4,10 @@ import java.util.Arrays;
 
 public class Parcer {
     String file;
-    //    String toReturn ="";
     private final Model model;
     private String result = "";
 
     public Parcer(Model model) {
-//        this.result = new Result(0, 0);
         this.model = model;
     }
 
@@ -40,7 +38,6 @@ public class Parcer {
                     for (int j = 1; j <= priceLength; j++) {
                         price += pow(j) * (str[i - j] - 0x30);
                     }
-                    // continue;
                 } else {
                     quantLength = i - 3 - priceLength;
                     operation = str[i + 1];
@@ -62,12 +59,10 @@ public class Parcer {
     private String parceQ(char[] str) {
         if (str[7] == 'b') {     //best bid
             result = model.bestBid() + "," + model.querySize(model.bestBid()) + "\n";
-            //            result.size = model.querySize(model.bestBid());
             return result;
         }
         if (str[7] == 'a') {     //best ask
             result = model.bestAsk() + "," + model.querySize(model.bestAsk()) + "\n";
-            //result.size = model.querySize(model.bestAsk());
             return result;
         }
         int price = 0;  //size
@@ -106,13 +101,3 @@ public class Parcer {
     }
 
 }
-
-//
-//class Result {
-//    Result(int size, int price) {
-//        this.size = size;
-//        this.price = price;
-//    }
-//    int size;
-//    int price;
-//}

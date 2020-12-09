@@ -150,17 +150,7 @@ public class Model {
     }
 
     public int querySize(int price) {
-        // return Math.max(askCol[price], bidCol[price]);
-        // int size = askCol[price] >= bidCol[price] ? askCol[price] : bidCol[price];
          return askCol[price] >= bidCol[price] ? askCol[price] : bidCol[price];
-
-//        if (price <= bestBid) {
-//            return bidCol[price] + ",bid";
-//        }
-//        if (price >= bestAsk) {
-//            return askCol[price] + ",ask";
-//        }
-//        return 0 + "spread";
     }
 
     public void sell(int quant) {

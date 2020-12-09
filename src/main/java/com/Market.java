@@ -4,7 +4,6 @@ import java.io.*;
 import java.util.concurrent.TimeUnit;
 
 public class Market {
-//market_inp.txt market_outp.txt
     public static void main(String[] args) throws IOException {
 
         if (args.length == 0 || args[0].length() < 1 || args[1].length() < 1) {
