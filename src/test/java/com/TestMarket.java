@@ -1,28 +1,9 @@
 package com;
-//package Users.Vovchik.IdeaProjects.market.src.main.java.com;
-//        package com.nikolenko.homeworks.homework_20;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import java.util.Scanner;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestMarket {
-
-    static String inpFile =
-            "u,9,1,bid\n" +
-            "u,11,5,ask\n" +
-            "u,11,4,bid\n" +
-            "q,best_bid\n" +
-            "u,10,2,bid\n" +
-            "q,best_bid\n" +
-            "q,size,10\n" +
-            "u,9,31,bid\n" +
-            "u,11,5,ask\n" +
-            "u,14,58,ask\n" +
-            "u,12,52,ask\n" +
-            "o,sell,12\n" +
-            "o,buy,02\n"
-    ;
 
     static Model model;
     static Parcer parcer;
@@ -43,7 +24,6 @@ public class TestMarket {
         parcer.parce("u,7,8,bid");
         parcer.parce("u,6,12,bid");
 
-//        model.showState(2);
         assertEquals("1\n",parcer.parce("q,size,9"));
         assertEquals("8\n",parcer.parce("q,size,7"));
         assertEquals("9,1\n",parcer.parce("q,best_bid"));
@@ -107,7 +87,6 @@ public class TestMarket {
         assertEquals("2\n",parcer.parce("q,size,9"));
         assertEquals("10,2\n",parcer.parce("q,best_ask"));
         assertEquals("9,2\n",parcer.parce("q,best_bid"));
-
 //        model.showState(2);
     }
 
@@ -167,12 +146,12 @@ public class TestMarket {
         parcer.parce("u,8,3,bid");
         parcer.parce("u,7,8,bid");
         parcer.parce("u,6,12,bid");
-
         parcer.parce("u,12,9,bid");
 
         assertEquals("9,1\n",parcer.parce("q,best_bid"));
         assertEquals("12,2\n",parcer.parce("q,best_ask"));
-        assertEquals("2\n",parcer.parce("q,size,12"));       assertEquals("0\n",parcer.parce("q,size,11"));
+        assertEquals("2\n",parcer.parce("q,size,12"));
+        assertEquals("0\n",parcer.parce("q,size,11"));
         assertEquals("0\n",parcer.parce("q,size,10"));
         assertEquals("1\n",parcer.parce("q,size,9"));
         assertEquals("0\n",parcer.parce("q,size,20"));

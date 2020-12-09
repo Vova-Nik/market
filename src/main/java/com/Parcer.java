@@ -1,16 +1,12 @@
 package com;
 
-import java.util.Arrays;
-
 public class Parcer {
-    String file;
-    //    String toReturn ="";
     private final Model model;
-    private String result = "";
+    private final int U_LENGTH; //max input string length e.g. "u,90000000,20000000,bid\n" = 8+8+8 = 24
 
     public Parcer(Model model) {
-//        this.result = new Result(0, 0);
         this.model = model;
+        U_LENGTH = model.getULength();
     }
 
     public String parce(String line) {
@@ -33,14 +29,13 @@ public class Parcer {
         int quantity = 0;
         char operation = ' '; //b == bid, a == ask;
 
-        for (int i = 2; i < model.U_LENGTH; i++) {
+        for (int i = 2; i < U_LENGTH; i++) {
             if (str[i] == ',') {
                 if (priceLength == 0) {
                     priceLength = i - 2;
                     for (int j = 1; j <= priceLength; j++) {
                         price += pow(j) * (str[i - j] - 0x30);
                     }
-                    // continue;
                 } else {
                     quantLength = i - 3 - priceLength;
                     operation = str[i + 1];
@@ -61,14 +56,10 @@ public class Parcer {
 
     private String parceQ(char[] str) {
         if (str[7] == 'b') {     //best bid
-            result = model.bestBid() + "," + model.querySize(model.bestBid()) + "\n";
-            //            result.size = model.querySize(model.bestBid());
-            return result;
+            return model.bestBid() + "," + model.querySize(model.bestBid()) + "\n";
         }
         if (str[7] == 'a') {     //best ask
-            result = model.bestAsk() + "," + model.querySize(model.bestAsk()) + "\n";
-            //result.size = model.querySize(model.bestAsk());
-            return result;
+            return model.bestAsk() + "," + model.querySize(model.bestAsk()) + "\n";
         }
         int price = 0;  //size
         for (int i = str.length - 1, j = 1; i >= 7; i--, j++) {
@@ -106,13 +97,3 @@ public class Parcer {
     }
 
 }
-
-//
-//class Result {
-//    Result(int size, int price) {
-//        this.size = size;
-//        this.price = price;
-//    }
-//    int size;
-//    int price;
-//}

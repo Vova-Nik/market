@@ -4,11 +4,10 @@ import java.io.*;
 import java.util.concurrent.TimeUnit;
 
 public class Market {
-//market_inp.txt market_outp.txt
     public static void main(String[] args) throws IOException {
 
         if (args.length == 0 || args[0].length() < 1 || args[1].length() < 1) {
-            System.out.println("Vova, Invalid input");
+            System.out.println("Invalid input");
             System.out.println("use");
             System.out.println("market inputfile outputfile");
             return;
@@ -18,17 +17,16 @@ public class Market {
         Model model = new Model();
         Parcer parcer = new Parcer(model);
 
-        BufferedWriter writter = null;
-        new BufferedWriter(new FileWriter(args[1]));
-
+        BufferedWriter writter;
         writter = new BufferedWriter(new FileWriter(args[1]));
 
         try (InputStreamReader inputStreamReader = new InputStreamReader(new FileInputStream(args[0]))) {
             BufferedReader br = new BufferedReader(inputStreamReader);
             String line;
             while ((line = br.readLine()) != null) {
-                if(line.length()>3)
-                writter.write(parcer.parce(line));
+                if(line.length()>3) {
+                    writter.write(parcer.parce(line));
+                }
             }
         }
         writter.close();

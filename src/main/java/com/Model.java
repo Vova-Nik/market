@@ -4,16 +4,16 @@ import java.util.Arrays;
 
 public class Model {
 
-    public int PRICE_LENGTH = 8;
-    public int QUANTITY_LENGTH = 8;
-    public int U_LENGTH = PRICE_LENGTH + QUANTITY_LENGTH + 8;
+    private final static int PRICE_LENGTH = 8;
+    private final static int QUANTITY_LENGTH = 8;
+    private final static int U_LENGTH = PRICE_LENGTH + QUANTITY_LENGTH + 8;
 
-    int MAX_POSSIBLE_PRICE = 9999;
-    final int[] askCol = new int[MAX_POSSIBLE_PRICE + 1];
-    final int[] bidCol = new int[MAX_POSSIBLE_PRICE + 1];
+    private final int MAX_POSSIBLE_PRICE = 9999;
+    private final int[] askCol = new int[MAX_POSSIBLE_PRICE + 1];
+    private final int[] bidCol = new int[MAX_POSSIBLE_PRICE + 1];
 
-    int maxPrice = 0;
-    int minPrice = 0;
+    private int maxPrice = 0;
+    private int minPrice = 0;
 
     private int differedBuy = 0;
     private int differedSell = 0;
@@ -24,6 +24,10 @@ public class Model {
     public Model() {
         Arrays.fill(askCol, 0);
         Arrays.fill(bidCol, 0);
+    }
+
+    public int getULength(){
+        return U_LENGTH;
     }
 
     public void updateBid(int price, int quant) {
@@ -87,14 +91,13 @@ public class Model {
         bestBid = 0;
     }
 
-    private int updateBestAsk() {
+    private void updateBestAsk() {
         for (int i = minPrice; i < askCol.length; i++) {
             if (askCol[i] > 0) {
                 bestAsk = i;
                 break;
             }
         }
-        return 0;
     }
 
     private void updateBests() {
@@ -114,14 +117,14 @@ public class Model {
         }
     }
 
-    public int updateAsk(int price, int quant) {
+    public void updateAsk(int price, int quant) {
         if (price > maxPrice || price < minPrice) {
             updateMinMaxPrices(price);
         }
         if (differedBuy > 0) {
             differedBuy -= quant;
             if (differedBuy > 0) {
-                return 0;
+                return;
             }
             quant = -differedBuy;
             differedBuy = 0;
@@ -129,38 +132,26 @@ public class Model {
         if (price > bestBid) {
             askCol[price] += quant;
             updateBestAsk();
-            return 0;
+            return;
         }
         sellForPrice(price, quant); //price <= bestBid;
         updateBestAsk();
         updateBestBid();
-        return 0;
     }
 
-    private int sellForPrice(int price, int quant) {
+    private void sellForPrice(int price, int quant) {
         for (int i = bestBid; i >= price; i--) {
             bidCol[i] -= quant;
             if (bidCol[i] >= 0) {
-                return 0;
+                return;
             }
             quant = -bidCol[i];
             bidCol[i] = 0;
         }
-        return quant;
     }
 
     public int querySize(int price) {
-        // return Math.max(askCol[price], bidCol[price]);
-        // int size = askCol[price] >= bidCol[price] ? askCol[price] : bidCol[price];
          return askCol[price] >= bidCol[price] ? askCol[price] : bidCol[price];
-
-//        if (price <= bestBid) {
-//            return bidCol[price] + ",bid";
-//        }
-//        if (price >= bestAsk) {
-//            return askCol[price] + ",ask";
-//        }
-//        return 0 + "spread";
     }
 
     public void sell(int quant) {
